@@ -1,0 +1,27 @@
+ //set depth_limit = 0
+    //prompt user to enter a root url and a depth limit >= 1
+
+    //Push root url into queue
+
+    //while depth_limit <= user-entered depth limit
+
+        //Add url in front of the queue to an array
+        //save HTML of url in txt file
+        //perform character extraction of txt file and save data in a vector
+
+        //if queue is empty
+            //depth_limit++
+                //if depth_limit <= user-entered depth limit
+                    //pop current web page
+                    //for each child url of current web page
+                        //if child url has not already been seen --> check by scanning array
+                            //push child url onto queue
+
+        //else if queue not empty
+            //pop current web page
+
+
+    //To Do:
+    //1. Extract web pages from the internet and save their html in a txt file
+    //2. Extract URLs from web pages
+    //3. Perform character extraction on web pages
