@@ -1,27 +1,26 @@
- //set depth_limit = 0
-    //prompt user to enter a root url and a depth limit >= 1
+    //depth = 0
+    //prompt user to enter a root url and a depth_limit >= 1
 
-    //Push root url into queue
+    //Push root url and depth of 0 into queue
 
-    //while depth_limit <= user-entered depth limit
-
-        //Add url in front of the queue to an array
+    //while depth <= depth_limit && queue not empty
+      
+        //Pop url from front of queue
+        //Set depth to depth associated with url --> necessary for backtracking up the tree of urls
         //save HTML of url in txt file
         //perform character extraction of txt file and save data in a vector
+        
+        //int children = 0
+        //if depth < depth_limit
+         //children = find_children(url)
+        
+        //if children > 0
+          //for (i = 0; i < children; i++)
+           // push unseen children with depth++ onto queue
+          
+          
+          *** must keep track of each url's depth
+        
+       
+                 
 
-        //if queue is empty
-            //depth_limit++
-                //if depth_limit <= user-entered depth limit
-                    //pop current web page
-                    //for each child url of current web page
-                        //if child url has not already been seen --> check by scanning array
-                            //push child url onto queue
-
-        //else if queue not empty
-            //pop current web page
-
-
-    //To Do:
-    //1. Extract web pages from the internet and save their html in a txt file
-    //2. Extract URLs from web pages
-    //3. Perform character extraction on web pages
