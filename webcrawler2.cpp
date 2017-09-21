@@ -121,8 +121,10 @@ public int find_children(string filename_str, int depth, stack<string>& stack1, 
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
         if (strncmp("href", url, 4) == 0) {
-            //push url onto stack if url has not already been seen? but first remove "href=" from the front of url
+            
             string url_str(url);
+            //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN
+            //TODO: REMOVE "HREF=" FROM THE FRONT OF THE URL
             stack1.push(url_str);
 
             //store associated depth of url into stack as (depth + 1)
