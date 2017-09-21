@@ -2,18 +2,16 @@
 #include <string>
 #include <ctype.h>
 #include <fstream>
-#include <iostream.h>
 #include <cstring>
 #include <stdlib.h>
-#include <fstream.h>
-#include <iomanip.h>
+#include <iomanip>
 #include <stack>
 
 
 using namespace std;
 
-public int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2, int i); //include as parameters pointers to the array of depths and queue containing urls
-public void char_extractor(string filename);
+int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2, int i); //include as parameters pointers to the array of depths and queue containing urls
+void char_extractor(string filename);
 
 
 int main() {
@@ -50,11 +48,13 @@ int main() {
     while (!url_stack.empty()) {
 
         //pop url from queue
-        filepath = url_stack.pop();
+        filepath = url_stack.top();
+        url_stack.pop();
 
 
         //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of urls?
-        depth = depth_stack.pop();
+        depth = depth_stack.top();
+        depth_stack.pop();
 
 
         //perform character extraction of url
@@ -73,7 +73,7 @@ int main() {
 
 
 
-public void char_extractor(string filename) {
+void char_extractor(string filename) {
     char c;
     double unigram_count[95] = {0};
     double total_unigrams = 0;
@@ -105,25 +105,26 @@ public void char_extractor(string filename) {
 
 
 
-public int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2, int i) {
+int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2, int i) {
 
     char javaCall[100], url[100];
     int num_of_links = 0;
+    string j = to_string(i);
 
     char *filename = filename_str.c_str();
-    
+
     strcat(javaCall, "java getWebPage ");
     strcat(javaCall, filename);
-    strcat(javaCall, " > output_" + to_string(i) + ".txt");
+    strcat(javaCall, " > output_" + j + ".txt");
     system(javaCall);
-    ifstream webpage("output_" + to_string(i) + ".txt");
+    ifstream webpage("output_" + j + ".txt");
 
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
         if (strncmp("href", url, 4) == 0) {
-            
+
             string url_str(url);
-            //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN
+            //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN --> FIX IF THERE IS TIME
             //TODO: REMOVE "HREF=" FROM THE FRONT OF THE URL
             stack1.push(url_str);
 
@@ -138,4 +139,3 @@ public int find_children(string filename_str, int depth, stack<string>& stack1, 
     return num_of_links;
 
 }
-
