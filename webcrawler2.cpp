@@ -12,7 +12,7 @@
 
 using namespace std;
 
-public int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2); //include as parameters pointers to the array of depths and queue containing urls
+public int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2, int i); //include as parameters pointers to the array of depths and queue containing urls
 public void char_extractor(string filename);
 
 
@@ -21,6 +21,7 @@ int main() {
     string filepath;
     int depth_limit = 0;
     int depth = 0;
+    int i = 0;
 
     //stack that stores urls
     stack<string> url_stack;
@@ -61,8 +62,9 @@ int main() {
 
         //Find children of url and store them into the stack. Also store their associated depths into an stack. Saves html to output file.
         if (depth < depth_limit) {
-            find_children(filepath, depth, url_stack, depth_stack);
+            find_children(filepath, depth, url_stack, depth_stack, i);
         }
+        i++;
 
     }
 
@@ -103,7 +105,7 @@ public void char_extractor(string filename) {
 
 
 
-public int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2) {
+public int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2, int i) {
 
     char javaCall[100], url[100];
     int num_of_links = 0;
@@ -112,9 +114,9 @@ public int find_children(string filename_str, int depth, stack<string>& stack1, 
     
     strcat(javaCall, "java getWebPage ");
     strcat(javaCall, filename);
-    strcat(javaCall, " > output.html");
+    strcat(javaCall, " > output_" + to_string(i) + ".txt");
     system(javaCall);
-    ifstream webpage("output.html");
+    ifstream webpage("output_" + to_string(i) + ".txt");
 
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
