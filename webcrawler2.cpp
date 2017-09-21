@@ -75,6 +75,8 @@ int main() {
             find_children(filepath, depth, url_stack, depth_stack, i);
             i++;
         }
+        
+        char_extractor("output_" + to_string(i) + ".txt");
 
     }
 
