@@ -44,7 +44,7 @@ int main() {
     //push root depth onto stack
     depth_stack.push(0);
 
-
+    //TODO: IMPLEMENT ITERATIVE DEEPENING
     while (!url_stack.empty()) {
 
         //pop url from queue
@@ -130,9 +130,16 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
 
             string url_str(url);
             //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN --> FIX IF THERE IS TIME
-            //Remove "href = from the front of the url and remove " from the end of the url
+            //Remove href=" from the front of the url and remove " from the end of the url
             url_str.erase(url_str.end());
-            url_str.erase(url_str.begin(), url_str.begin()+6);
+            url_str.erase(url_str.begin());
+            url_str.erase(url_str.begin()+1);
+            url_str.erase(url_str.begin()+2);
+            url_str.erase(url_str.begin()+3);
+            url_str.erase(url_str.begin()+4);
+            url_str.erase(url_str.begin()+5);
+
+            //push url onto stack
             stack1.push(url_str);
 
             //store associated depth of url into stack as (depth + 1)
