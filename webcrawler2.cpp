@@ -15,59 +15,59 @@ void char_extractor(string filename);
 
 
 int main() {
-    
+
     string filepath;
     int depth_limit = 0;
     int depth = 0;
     int i = 0;
-    
+
     //stack that stores urls
     stack<string> url_stack;
-    
+
     //stack that stores depths of urls
     stack<int> depth_stack;
-    
+
     //prompting input
     cout << "Please input the path to a text file: ";
     cin >> filepath;
-    
-    
+
+
     //checking user input
     while (depth_limit < 1) {
         cout << "Please input a depth limit >= 1:";
         cin >> depth_limit;
     }
-    
+
     //push root filepath onto stack
     url_stack.push(filepath);
-    
+
     //push root depth onto stack
     depth_stack.push(0);
-    
-    
+
+
     while (!url_stack.empty()) {
-        
+
         //pop url from queue
         filepath = url_stack.top();
         url_stack.pop();
-        
-        
+
+
         //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of urls?
         depth = depth_stack.top();
         depth_stack.pop();
-        
-        
+
+
         //perform character extraction of url
         char_extractor(filepath);
-        
+
         //Find children of url and store them into the stack. Also store their associated depths into an stack. Saves html to output file.
         if (depth < depth_limit) {
             find_children(filepath, depth, url_stack, depth_stack, i);
         }
         i++;
-        
+
     }
-    
+
     return 0;
 }
 
@@ -77,9 +77,9 @@ void char_extractor(string filename) {
     char c;
     double unigram_count[95] = {0};
     double total_unigrams = 0;
-    
+
     ifstream in_text(filename);
-    
+
     while (in_text >> noskipws >> c) {
         if (isprint(c)) {
             int i = c - 32;
@@ -87,35 +87,35 @@ void char_extractor(string filename) {
             total_unigrams++;
         }
     }
-    
+
     in_text.close();
-    
+
     // Create and write to new text file containing relative frequencies
-    
+
     string new_filename = filename.erase(filename.length() - 4, 4) + "_unigrams.txt";
     ofstream out_text(new_filename);
-    
+
     for (int i = 0; i < 95; i++) {
         char a = i + 32;
         out_text << a << ": " << unigram_count[i] / total_unigrams << "\n";
     }
-    
+
     out_text.close();
 }
 
 
 
 int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2, int i) {
-    
+
     char javaCall[100], url[100];
     int num_of_links = 0;
     string j = to_string(i);
     char *k = new char[j.size()+1];
     strcpy(k, j.c_str());
-    
+
     char *filename = new char[filename_str.size()+1];
     strcpy(filename, filename_str.c_str());
-    
+
     strcat(javaCall, "java getWebPage ");
     strcat(javaCall, filename);
     strcat(javaCall, " > output_");
@@ -123,24 +123,26 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
     strcat(javaCall, ".txt");
     system(javaCall);
     ifstream webpage("output_" + j + ".txt");
-    
+
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
         if (strncmp("href", url, 4) == 0) {
-            
+
             string url_str(url);
             //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN --> FIX IF THERE IS TIME
-            //TODO: REMOVE "HREF=" FROM THE FRONT OF THE URL
+            //Remove "href = from the front of the url and remove " from the end of the url
+            url_str.erase(url_str.end());
+            url_str.erase(url_str.begin(), url_str.begin()+6);
             stack1.push(url_str);
-            
+
             //store associated depth of url into stack as (depth + 1)
             stack2.push(depth + 1);
             num_of_links++;
         }
     }
-    
+
     webpage.close();
-    
+
     return num_of_links;
-    
+
 }
