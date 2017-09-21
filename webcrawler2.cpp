@@ -73,10 +73,7 @@ int main() {
 
 
 
-public void char_extractor(char filename[]) {
-
-    filename =
-
+public void char_extractor(string filename) {
     char c;
     double unigram_count[95] = {0};
     double total_unigrams = 0;
