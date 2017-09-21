@@ -108,11 +108,13 @@ public void char_extractor(char filename[]) {
 
 
 
-public int find_children(char filename[], int depth, stack<string>& stack1, stack<int>& stack2) {
+public int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2) {
 
     char javaCall[100], url[100];
     int num_of_links = 0;
 
+    filename.c_str();
+    
     strcat(javaCall, "java getWebPage ");
     strcat(javaCall, filename);
     strcat(javaCall, " > output.html");
