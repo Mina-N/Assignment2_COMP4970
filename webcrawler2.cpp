@@ -9,8 +9,6 @@
 #include <iomanip.h>
 #include <stack>
 
-//***CHANGE INCONSISTENCIES BETWEEN CHARACTERS AND STRINGS***
-
 
 using namespace std;
 
