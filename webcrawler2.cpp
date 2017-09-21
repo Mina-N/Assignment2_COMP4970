@@ -65,18 +65,13 @@ int main() {
         depth_stack.pop();
 
 
-        //perform character extraction of URL
-        char_extractor(filepath);
-
-
-
         //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
         if (depth < depth_limit) {
             find_children(filepath, depth, url_stack, depth_stack, i);
-            i++;
         }
         
         char_extractor("output_" + to_string(i) + ".txt");
+        i++;
 
     }
 
