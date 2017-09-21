@@ -8,6 +8,7 @@
 #include <stack>
 #include <stdio.h>
 #include <cstdlib>
+#include <sstream>
 
 
 using namespace std;
@@ -41,7 +42,7 @@ int main() {
 
     //checking user input
     while (depth_limit < 1) {
-        cout << "Please input a depth limit >= 1:";
+        cout << "Please input a depth limit >= 1:  ";
         cin >> depth_limit;
     }
 
@@ -67,7 +68,9 @@ int main() {
         //perform character extraction of URL
         char_extractor(filepath);
 
-        //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTMLof expanded URL in a .txt file
+
+
+        //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
         if (depth < depth_limit) {
             find_children(filepath, depth, url_stack, depth_stack, i);
             i++;
@@ -116,6 +119,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
 
     char javaCall[100] = "";
     char url[100] = "";
+    string new_url_str, unnecessary = "";
     int num_of_links = 0;
     string j = to_string(i);
     char *k = new char[j.size()+1];
@@ -135,24 +139,30 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
         if (strncmp("href", url, 4) == 0) {
-
+           // cout << url << endl;
             string url_str(url);
             //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN --> FIX IF THERE IS TIME
-            //Remove href=" from the front of the URL and remove " from the end of the URL
-            url_str.erase(url_str.end());
-            url_str.erase(url_str.begin());
-            url_str.erase(url_str.begin()+1);
-            url_str.erase(url_str.begin()+2);
-            url_str.erase(url_str.begin()+3);
-            url_str.erase(url_str.begin()+4);
-            url_str.erase(url_str.begin()+5);
 
-            //push URL onto stack
-            stack1.push(url_str);
+            //Remove href=" from the front of the URL and remove " from the end of the URL:
+            //Use quotation marks as delimiters
 
-            //store associated depth of URL into stack as (depth + 1)
-            stack2.push(depth + 1);
-            num_of_links++;
+            stringstream ss(url_str);
+
+
+            getline(ss, unnecessary, '"');
+            getline(ss, new_url_str, '"');
+
+            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http")) {
+
+                //push URL onto stack
+                stack1.push(new_url_str);
+                cout << "Stack1: " << stack1.top() << endl;
+
+                //store associated depth of URL into stack as (depth + 1)
+                stack2.push(depth + 1);
+                cout << "Stack2: " <<stack2.top() << endl;
+                num_of_links++;
+            }
         }
     }
 
