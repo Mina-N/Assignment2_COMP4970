@@ -7,12 +7,15 @@
 #include <stdlib.h>
 #include <fstream.h>
 #include <iomanip.h>
+#include <stack>
+
+//***CHANGE INCONSISTENCIES BETWEEN CHARACTERS AND STRINGS***
 
 
 using namespace std;
 
-public int find_children(string filename, int depth); //include as parameters pointers to the array of depths and queue containing urls
-public void char_extractor(string fileame);
+public int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2); //include as parameters pointers to the array of depths and queue containing urls
+public void char_extractor(string filename);
 
 
 int main() {
@@ -21,10 +24,11 @@ int main() {
     int depth_limit = 0;
     int depth = 0;
 
-    //queue that stores urls
-    queue<string> url_queue;
+    //stack that stores urls
+    stack<string> url_stack;
 
-    //array that stores depths of urls
+    //stack that stores depths of urls
+    stack<int> depth_stack;
 
     //prompting input
     cout << "Please input the path to a text file: ";
@@ -33,32 +37,33 @@ int main() {
 
     //checking user input
     while (depth_limit < 1) {
-        cout << "Please input a depth limit >= 1: ";
+        cout << "Please input a depth limit >= 1:";
         cin >> depth_limit;
     }
 
-    //push root filepath onto queue
-    url_queue.push(filepath);
+    //push root filepath onto stack
+    url_stack.push(filepath);
+
+    //push root depth onto stack
+    depth_stack.push(0);
 
 
-    while (!url_queue.empty()) {
+    while (!url_stack.empty()) {
 
         //pop url from queue
-        filepath = url_queue.pop();
+        filepath = url_stack.pop();
 
 
-        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of urls
-
-
-        //save html of url in a text file?
+        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of urls?
+        depth = depth_stack.pop();
 
 
         //perform character extraction of url
         char_extractor(filepath);
 
-        //Find children of url and store them into the queue. Also store their associated depths into an array.
+        //Find children of url and store them into the stack. Also store their associated depths into an stack. Saves html to output file.
         if (depth < depth_limit) {
-            find_children(filepath, depth); //include queue and array parameters here
+            find_children(filepath, depth, url_stack, depth_stack);
         }
 
     }
@@ -68,7 +73,9 @@ int main() {
 
 
 
-public void char_extractor(string filename) {
+public void char_extractor(char filename[]) {
+
+    filename =
 
     char c;
     double unigram_count[95] = {0};
@@ -101,7 +108,7 @@ public void char_extractor(string filename) {
 
 
 
-public int find_children(string filename, int depth) { //does this work with a string filename instead of a char filename? include array and queue as parameters here
+public int find_children(char filename[], int depth, stack<string>& stack1, stack<int>& stack2) {
 
     char javaCall[100], url[100];
     int num_of_links = 0;
@@ -115,8 +122,11 @@ public int find_children(string filename, int depth) { //does this work with a s
     while (!webpage.eof()) {
         webpage >> setw(99) >> url;
         if (strncmp("href", url, 4) == 0) {
-            //push url into queue if url has not already been seen, but first remove "href=" from the front of url
-            //store associated depth of url into array as (depth + 1)
+            //push url onto stack if url has not already been seen? but first remove "href=" from the front of url
+            stack1.push(url);
+
+            //store associated depth of url into stack as (depth + 1)
+            stack2.push(depth + 1);
             num_of_links++;
         }
     }
