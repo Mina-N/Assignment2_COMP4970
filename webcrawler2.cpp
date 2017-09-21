@@ -6,11 +6,18 @@
 #include <stdlib.h>
 #include <iomanip>
 #include <stack>
+#include <stdio.h>
+#include <cstdlib>
 
 
 using namespace std;
 
-int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2, int i); //include as parameters pointers to the array of depths and queue containing urls
+// Finds the children of filename and stores them and their associated depths into stacks. Writes the html of each expanded
+// URL to a .txt file.
+int find_children(string filename, int depth, stack<string>& stack1, stack<int>& stack2, int i);
+
+// Takes text file path as keyboard input and writes the unigram vector to new text file. Writes relative
+// frequency of both printable characters.
 void char_extractor(string filename);
 
 
@@ -21,10 +28,10 @@ int main() {
     int depth = 0;
     int i = 0;
 
-    //stack that stores urls
+    //stack that stores URLs
     stack<string> url_stack;
 
-    //stack that stores depths of urls
+    //stack that stores depths of URLs
     stack<int> depth_stack;
 
     //prompting input
@@ -52,19 +59,19 @@ int main() {
         url_stack.pop();
 
 
-        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of urls?
+        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of URLs
         depth = depth_stack.top();
         depth_stack.pop();
 
 
-        //perform character extraction of url
+        //perform character extraction of URL
         char_extractor(filepath);
 
-        //Find children of url and store them into the stack. Also store their associated depths into an stack. Saves html to output file.
+        //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTMLof expanded URL in a .txt file
         if (depth < depth_limit) {
             find_children(filepath, depth, url_stack, depth_stack, i);
+            i++;
         }
-        i++;
 
     }
 
@@ -107,7 +114,8 @@ void char_extractor(string filename) {
 
 int find_children(string filename_str, int depth, stack<string>& stack1, stack<int>& stack2, int i) {
 
-    char javaCall[100], url[100];
+    char javaCall[100] = "";
+    char url[100] = "";
     int num_of_links = 0;
     string j = to_string(i);
     char *k = new char[j.size()+1];
@@ -130,7 +138,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
 
             string url_str(url);
             //TODO: FIGURE OUT IF URL HAS NOT ALREADY BEEN SEEN --> FIX IF THERE IS TIME
-            //Remove href=" from the front of the url and remove " from the end of the url
+            //Remove href=" from the front of the URL and remove " from the end of the URL
             url_str.erase(url_str.end());
             url_str.erase(url_str.begin());
             url_str.erase(url_str.begin()+1);
@@ -139,10 +147,10 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             url_str.erase(url_str.begin()+4);
             url_str.erase(url_str.begin()+5);
 
-            //push url onto stack
+            //push URL onto stack
             stack1.push(url_str);
 
-            //store associated depth of url into stack as (depth + 1)
+            //store associated depth of URL into stack as (depth + 1)
             stack2.push(depth + 1);
             num_of_links++;
         }
