@@ -53,24 +53,24 @@ int main() {
     depth_stack.push(0);
    
    //IMPROVEMENT: WE ARE USING DEPTH-LIMITED SEARCH INSTEAD OF ITERATIVE DEEPENING SEARCH
-        while (!url_stack.empty()) {
+    while (!url_stack.empty()) {
        
-            //pop url from queue
-            filepath = url_stack.top();
-            url_stack.pop();
+        //pop url from queue
+        filepath = url_stack.top();
+        url_stack.pop();
         
         
-            //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of URLs
-            depth = depth_stack.top();
-            depth_stack.pop();
+        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of URLs
+        depth = depth_stack.top();
+        depth_stack.pop();
         
         
-            //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
-            find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_max);
+        //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
+        find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_max);
         
-            char_extractor("output_" + to_string(i) + ".txt");
-            i++;
-        }
+        char_extractor("output_" + to_string(i) + ".txt");
+        i++;
+    }
 
     return 0;
     
@@ -102,6 +102,8 @@ void char_extractor(string filename) {
     
     for (int i = 0; i < 95; i++) {
         char a = i + 32;
+        
+        // IMPROVEMENT: NORMALIZE UNIGRAM FREQUENCY BY TOTAL UNOGRAMS
         out_text << a << ": " << unigram_count[i] / total_unigrams << "\n";
     }
     
@@ -151,7 +153,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             
             //IMPROVEMENT: prevents any URLS that do not begin with "http" from being pushed onto the stack
             
-            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http")) {
+            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http") && strncmp(url, filename)) {
                 
                 //push URL onto stack
                 stack1.push(new_url_str);
@@ -163,11 +165,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
                 num_of_links++;
             }
         }
-        // IMPROVEMENT: deletes html source of url not at depth limit
-        remove("output_" + to_string(k) + ".txt");
     }
-    if (new_url_str.substr(0, 4) != "http") {
-        remove("output_" + to_string(k) + ".txt");
     }
     
     webpage.close();
