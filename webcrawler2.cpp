@@ -26,6 +26,7 @@ int main() {
     
     string filepath;
     int depth_limit = 0;
+    int depth_max = 0
     int depth = 0;
     int i = 0;
     
@@ -43,7 +44,7 @@ int main() {
     //checking user input
     while (depth_limit < 0) {
         cout << "Please input a depth limit >= 0:  ";
-        cin >> depth_limit;
+        cin >> depth_max;
     }
     
     //push root filepath onto stack
@@ -53,27 +54,30 @@ int main() {
     depth_stack.push(0);
     
     //TODO: IMPLEMENT ITERATIVE DEEPENING
-    while (!url_stack.empty()) {
+    while (depth_limit <= depth_max)
+        while (!url_stack.empty()) {
         
-        //pop url from queue
-        filepath = url_stack.top();
-        url_stack.pop();
-        
-        
-        //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of URLs
-        depth = depth_stack.top();
-        depth_stack.pop();
+            //pop url from queue
+            filepath = url_stack.top();
+            url_stack.pop();
         
         
-        //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
-        find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_limit);
+            //set depth to depth associated with url by checking array --> necessary for backtracking up the tree of URLs
+            depth = depth_stack.top();
+            depth_stack.pop();
         
-        char_extractor("output_" + to_string(i) + ".txt");
-        i++;
         
+            //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
+            find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_limit);
+        
+            char_extractor("output_" + to_string(i) + ".txt");
+            i++;
+        }
+        depth_limit++;
     }
-    
+
     return 0;
+    
 }
 
 
@@ -157,10 +161,15 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
                 
                 //store associated depth of URL into stack as (depth + 1)
                 stack2.push(depth + 1);
-                cout << "Stack2: " <<stack2.top() << endl;
+                cout << "Stack2: " << stack2.top() << endl;
                 num_of_links++;
             }
         }
+        // IMPROVEMENT: deletes html source of url not at depth limit
+        remove("output_" + to_string(k) + ".txt");
+    }
+    if (new_url_str.substr(0, 4) != "http") {
+        remove("output_" + to_string(k) + ".txt");
     }
     
     webpage.close();
