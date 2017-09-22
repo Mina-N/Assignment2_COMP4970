@@ -52,8 +52,7 @@ int main() {
     
     //push root depth onto stack
     depth_stack.push(0);
-    
-    //TODO: IMPLEMENT ITERATIVE DEEPENING
+   
     while (depth_limit <= depth_max)
         while (!url_stack.empty()) {
         
@@ -152,6 +151,8 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             
             getline(ss, unnecessary, '"');
             getline(ss, new_url_str, '"');
+            
+            //IMPROVEMENT: prevents any URLS that do not begin with "http" from being pushed onto the stack
             
             if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http")) {
                 
