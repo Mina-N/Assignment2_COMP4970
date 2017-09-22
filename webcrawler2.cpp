@@ -25,7 +25,6 @@ void char_extractor(string filename);
 int main() {
     
     string filepath;
-    int depth_limit = 0;
     int depth_max = 0
     int depth = 0;
     int i = 0;
@@ -53,9 +52,9 @@ int main() {
     //push root depth onto stack
     depth_stack.push(0);
    
-    while (depth_limit <= depth_max)
+   //IMPROVEMENT: WE ARE USING DEPTH-LIMITED SEARCH INSTEAD OF ITERATIVE DEEPENING SEARCH
         while (!url_stack.empty()) {
-        
+       
             //pop url from queue
             filepath = url_stack.top();
             url_stack.pop();
@@ -72,8 +71,6 @@ int main() {
             char_extractor("output_" + to_string(i) + ".txt");
             i++;
         }
-        depth_limit++;
-    }
 
     return 0;
     
