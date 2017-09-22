@@ -66,7 +66,7 @@ int main() {
         
         
             //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
-            find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_limit);
+            find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_max);
         
             char_extractor("output_" + to_string(i) + ".txt");
             i++;
