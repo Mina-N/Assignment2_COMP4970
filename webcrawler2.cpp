@@ -25,7 +25,7 @@ void char_extractor(string filename);
 int main() {
     
     string filepath;
-    int depth_max = 0
+    int depth_limit = 0;
     int depth = 0;
     int i = 0;
     
@@ -43,7 +43,7 @@ int main() {
     //checking user input
     while (depth_limit < 0) {
         cout << "Please input a depth limit >= 0:  ";
-        cin >> depth_max;
+        cin >> depth_limit;
     }
     
     //push root filepath onto stack
@@ -66,7 +66,7 @@ int main() {
         
         
         //Find children of URL and store them into the stack. Also store their associated depths into an stack. Saves HTML of expanded URL in a .txt file
-        find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_max);
+        find_children(filepath, depth, url_stack, depth_stack, i, depth >= depth_limit);
         
         char_extractor("output_" + to_string(i) + ".txt");
         i++;
