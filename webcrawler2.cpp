@@ -25,7 +25,7 @@ void char_extractor(string filename);
 int main() {
     
     string filepath;
-    int depth_limit = 0;
+    int depth_limit = -1;
     int depth = 0;
     int i = 0;
     
@@ -36,7 +36,7 @@ int main() {
     stack<int> depth_stack;
     
     //prompting input
-    cout << "Please input the path to a text file: ";
+    cout << "Please input a root URL: ";
     cin >> filepath;
     
     
@@ -51,10 +51,10 @@ int main() {
     
     //push root depth onto stack
     depth_stack.push(0);
-   
-   //IMPROVEMENT: WE ARE USING DEPTH-LIMITED SEARCH INSTEAD OF ITERATIVE DEEPENING SEARCH
+    
+    //IMPROVEMENT: WE ARE USING DEPTH-LIMITED SEARCH INSTEAD OF ITERATIVE DEEPENING SEARCH
     while (!url_stack.empty()) {
-       
+        
         //pop url from queue
         filepath = url_stack.top();
         url_stack.pop();
@@ -71,7 +71,7 @@ int main() {
         char_extractor("output_" + to_string(i) + ".txt");
         i++;
     }
-
+    
     return 0;
     
 }
@@ -153,7 +153,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             
             //IMPROVEMENT: prevents any URLS that do not begin with "http" from being pushed onto the stack
             
-            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http") && strncmp(url, filename, url.size())) {
+            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http") && strncmp(url, filename, sizeof(url)/sizeof(url[0]))) {
                 
                 //push URL onto stack
                 stack1.push(new_url_str);
@@ -166,10 +166,8 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             }
         }
     }
-    }
-    
+
     webpage.close();
-    
+
     return num_of_links;
-    
 }
