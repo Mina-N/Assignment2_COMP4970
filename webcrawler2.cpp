@@ -153,7 +153,7 @@ int find_children(string filename_str, int depth, stack<string>& stack1, stack<i
             
             //IMPROVEMENT: prevents any URLS that do not begin with "http" from being pushed onto the stack
             
-            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http") && strncmp(url, filename)) {
+            if ((new_url_str[0] != '#') && (new_url_str.substr(0, 4) == "http") && strncmp(url, filename, url.size())) {
                 
                 //push URL onto stack
                 stack1.push(new_url_str);
