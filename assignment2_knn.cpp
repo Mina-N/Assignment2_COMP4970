@@ -54,16 +54,16 @@ updates:
 int init_trng_set(Data_Point trng_set[]) {
     ifstream input("our_dataset.txt");
     string line;
-    int i = 0;
+    int j = 0;
     while (getline(input, line)) {
-        trng_set[i++] = Data_Point(line);
-        cout << trng_set->pnt_id << endl;
-        cout << trng_set->clsfr << endl;
+        trng_set[j++] = Data_Point(line);
+        cout << trng_set[j-1].pnt_id << endl;
+        cout << trng_set[j-1].clsfr << endl;
         for (int i = 0; i < 95; i++) {
-            cout << trng_set->feat_vecs[i] << " ";
+            cout << trng_set[j-1].feat_vecs[i] << " ";
         }
         cout << " " << endl;
     }
 
-    return i;
+    return j;
 }
