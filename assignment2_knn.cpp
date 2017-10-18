@@ -64,7 +64,7 @@ int main() {
 
         //randomly select a Data Point from the array
         int random_index = (rand() % act_pop);
-        cout << random_index << endl;
+       // cout << random_index << endl;
 
         //calculate the distances between the target instance and the other instances by calculating Euclidean distances between the 95 features
         distance(trng_set, act_pop, random_index, distances);
@@ -91,6 +91,9 @@ int main() {
             }
         } else if (k == 3) {
             three_closest_instances(distances, act_pop, index_array_3);
+           // cout << index_array_3[0] << endl;
+            //cout << index_array_3[1] << endl;
+           // cout << index_array_3[2] << endl;
             new_class = new_classification(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
             //trng_set[random_index].clsfr = new_class;
             cout << "New classification for Data_Point " << random_index << " is " << new_class << endl;
