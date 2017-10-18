@@ -74,8 +74,18 @@ void init_trng_set(Data_Point trng_set[]) {
     ifstream input("our_dataset.txt");
     string line;
     int j = 0;
+    double magnitude;
     while (getline(input, line)) {
         trng_set[j++] = Data_Point(line);
+        magnitude = 0;
+        for (int k = 0; k < 95; k++) {
+            magnitude += pow(trng_set[j-1].feat_vecs[k], 2);
+        }
+        if (magnitude != 0) {
+            for (int k = 0; k < 95; k++) {
+                trng_set[j-1].feat_vecs[k] /= sqrt(magnitude);
+            }
+        }
     }
 }
 
