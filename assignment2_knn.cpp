@@ -52,6 +52,7 @@ int main() {
         // Instantiate and Initialize arrays for the training set and cluster points
         Data_Point trng_set[POPULATION];
         float distances[595];
+        //manually set k = 3 -> can uncomment lines 73 to 80 if user-entered values are desired
         int k = 3;
         int index_array_3[3];
         int index_array_5[5];
@@ -127,7 +128,6 @@ int main() {
 }
 
 /* Initialize Training Set
-MAC 10/15/17
 Reads in a file containing the whole dataset of the training data. For each of
 the training elements stores the id, classifier, and all 95 feature values.
 input: Empty array of data points
@@ -152,6 +152,7 @@ int init_trng_set(Data_Point trng_set[]) {
     return j;
 }
 
+// Calculate distance between target training instance and the other 595 training instances.
 
 float* distance(Data_Point trng_set[], int array_length, int random_index, float distances[]) {
 
@@ -178,6 +179,8 @@ float* distance(Data_Point trng_set[], int array_length, int random_index, float
 
 }
 
+// When k = 1, calculate the nearest instance to the target instance and return the index of the nearest instance.
+
 int closest_instance(float distances[], int array_length) {
 
     int closest_index = 0;
@@ -191,6 +194,7 @@ int closest_instance(float distances[], int array_length) {
     return closest_index;
 }
 
+// Calculate the three closest instances to the target instance and return their indices.
 
 int* three_closest_instances(float distances[], int array_length, int index_array[]) {
     int index1, index2, index3 = 0;
@@ -233,6 +237,8 @@ int* three_closest_instances(float distances[], int array_length, int index_arra
 
     return index_array;
 }
+
+// Calculate the five closest instances to the target instance and return their indices.
 
 int* five_closest_instances(float distances[], int array_length, int index_array[]) {
 
@@ -285,6 +291,9 @@ int* five_closest_instances(float distances[], int array_length, int index_array
 
     return index_array;
 }
+
+
+// Calculates the new classification of the target instance by taking the average of the classifications of the k nearest instances. Returns the new classification.
 
 float new_classification(Data_Point trng_set[], int instance1_index, int instance2_index, int instance3_index, int instance4_index, int instance5_index) {
     float new_classification = 0;
