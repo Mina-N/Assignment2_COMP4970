@@ -36,7 +36,7 @@ class Data_Point {
         float dist = 0;
         int i;
         for(i = 0; i < 95; i++)
-            dist += pow((this->feat_vecs[i] + b.feat_vecs[i]), 2);
+            dist += pow((this->feat_vecs[i] - b.feat_vecs[i]), 2);
         
         return sqrt(dist);
     }
@@ -75,14 +75,32 @@ updates:
 int init_trng_set(Data_Point trng_set[]) {
     ifstream input("our_dataset.txt");
     string line;
-    int i = 0;
-    while(getline(input, line))
+    int i = 0, j;
+    double magnitude;
+    while(getline(input, line)) {
+        magnitude = 0;
+        
+        for(j = 0; j < 95; j++)
+            magnitude += pow(trng_set[i-1].feat_vecs[j], 2);
+        
+        if(magnitude != 0) {
+            for(j = 0; j < 95; j++)
+                trng_set[i - 1].feat_vecs[j] /= sqrt(magnitude);
+        }
+        
         trng_set[i++] = Data_Point(line);
+    }
     
     return i;
 } 
 
+int is_good(int closest[K], int id) {
+    int i;
+    for(i = 0; i < K; i++) 
+        if(id == closest[i]) return 0;
 
+    return 1;
+}
 /* Classify
 MAC 10/18/17
 Classify a test element as the majority classification of the k closest elements
@@ -97,38 +115,29 @@ int classify(int n, Data_Point trng_set[], Data_Point test_item) {
     int closest[K];
     float min = 1;
     float distances[POPULATION];
-     
+    Data_Point srtd_trng[POPULATION];
+    
     for(i = 0; i < n; i++)
         distances[i] = test_item.distance(trng_set[i]);
     
-    // // printf("%i\n\n", test_item.pnt_id);
-    // for(j = 0; j < K; j++) {
-    //     min = distances[0];
-        
-        
-    //     for(i = 0; i < n; i++) {
-    //         if(distances[i] < min) {
-    //             printf("%i, %i: %f, %f\n", i, trng_set[i].clsfr, min, distances[i]);
-    //             min = distances[i];
-    //             ind = i;
-    //         }
-    //     }
-        
-        
-    //     closest[j] = ind;
-    //     distances[ind] = 1;
-    //     min = distances[0];
-    // }
-    
-    min = distances[0];
+    distances[test_item.pnt_id] = 10;
+    for(j = 0; j < K; j++) {
     for(i = 0; i < n; i++) {
         if(distances[i] < min) {
             min = distances[i];
-            printf("%i\n", i);
+            ind = i;
         }
     }
+    closest[j] = ind;
+    distances[ind] = 10;
+    min = 1;
+    }
     
-    if(clsfr > 0)
+    for(j = 0; j < K; j++) {
+        if(trng_set[closest[j]].clsfr == 1) clsfr++;
+    }
+        
+    if(clsfr > ((K - 1) / 2))
         return 1;
     else return -1;
 }
