@@ -102,9 +102,9 @@ int main() {
             }
         } else if (k == 3) {
             three_closest_instances(distances, act_pop, index_array_3);
-            new_class = new_classification_average(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1,
-                                                   -1);
-            // new_class = new_classification_common(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
+           // new_class = new_classification_average(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1,
+           //                                        -1);
+            new_class = new_classification_common(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
             //trng_set[random_index].clsfr = new_class;
             cout << "New classification for Data_Point " << (i + 1) << " is " << new_class << endl;
             if ((trng_set[i].clsfr < 0 && new_class < 0) || (trng_set[i].clsfr == 0 && new_class == 0) ||
@@ -116,9 +116,9 @@ int main() {
 
         } else if (k == 5) {
             five_closest_instances(distances, act_pop, index_array_5);
-            new_class = new_classification_average(trng_set, index_array_5[0], index_array_5[1], index_array_5[2],
-                                                   index_array_5[3], index_array_5[4]);
-            // new_class = new_classification_common(trng_set, index_array_5[0], index_array_5[1], index_array_5[2], index_array_5[3], index_array_5[4]);
+            //new_class = new_classification_average(trng_set, index_array_5[0], index_array_5[1], index_array_5[2],
+            //                                       index_array_5[3], index_array_5[4]);
+            new_class = new_classification_common(trng_set, index_array_5[0], index_array_5[1], index_array_5[2], index_array_5[3], index_array_5[4]);
             // trng_set[random_index].clsfr = new_class;
             cout << "New classification for Data Point " << (i + 1) << " is " << new_class << endl;
             if ((trng_set[i].clsfr < 0 && new_class < 0) ||
