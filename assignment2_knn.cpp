@@ -55,12 +55,6 @@ int main() {
 
     //trng_set is now an array that contains 595 Data_Points, with each Data_Point storing a point id, classification, and a feature vector of size 95
 
-   // for (int i = 0; i < 595; i++) {
-   //     for (int j = 0; j < 95; j++) {
-   //         cout << "instance " << i + 1 << "feature number " << j + 1 << " " << trng_set[i].feat_vecs[j] << endl;
-   //     }
-  //  }
-
     // srand(time(0));
 
     //select the closest (k = 1) / three closest (k = 3) / five closest (k = 5) instances and find the new classification for the target instance
@@ -72,65 +66,71 @@ int main() {
         cin >> k;
     }
 
-    for (int i = 0; i < 595; i++) {
-        // Instantiate and Initialize arrays for the training set and cluster points
-        int index_array_3[3] = {0, 0, 0};
-        int index_array_5[5] = {0, 0, 0, 0, 0};
-        int index = 0;
-        float new_class = 0;
-        float distances[595];
 
-        //calculate the distances between the target instance (i) and the other instances by calculating Euclidean distances between the 95 features
-        distance(trng_set, act_pop, i, distances);
+        for (int i = 0; i < 595; i++) {
+            // Instantiate and Initialize arrays for the training set and cluster points
+            int index_array_3[3] = {0, 0, 0};
+            int index_array_5[5] = {0, 0, 0, 0, 0};
+            int index = 0;
+            float new_class = 0;
+            float distances[595];
 
-        /*
-        //  int random_index = (rand() % act_pop);
-        // cout << random_index << endl;
-         */
+            //calculate the distances between the target instance (i) and the other instances by calculating Euclidean distances between the 95 features
+            distance(trng_set, act_pop, i, distances);
 
-        if (k == 1) {
-            index = closest_instance(distances, act_pop);
-            cout << "closest instance is " << index << endl;
-            // trng_set[random_index].clsfr = trng_set[index].clsfr;
-            cout << "New classification for Data_Point " << (i + 1) << " is " << trng_set[index].clsfr << endl;
-            if ((trng_set[i].clsfr < 0 && trng_set[index].clsfr < 0) ||
-                (trng_set[i].clsfr > 0 && trng_set[index].clsfr > 0) ||
-                (trng_set[i].clsfr == 0 && trng_set[index].clsfr == 0)) {
-                correct++;
-            } else {
-                incorrect++;
+            /*
+            //  int random_index = (rand() % act_pop);
+            // cout << random_index << endl;
+             */
+
+            if (k == 1) {
+                index = closest_instance(distances, act_pop);
+                cout << "Closest instance is " << index << endl;
+                cout << "Calculated classification for Data_Point " << (i + 1) << " is " << trng_set[index].clsfr
+                     << endl;
+                if ((trng_set[i].clsfr < 0 && trng_set[index].clsfr < 0) ||
+                    (trng_set[i].clsfr > 0 && trng_set[index].clsfr > 0) ||
+                    (trng_set[i].clsfr == 0 && trng_set[index].clsfr == 0)) {
+                    correct++;
+                    trng_set[i].clsfr = trng_set[index].clsfr;
+                    cout << "New classification for Data Point " << (i + 1) << " is " << new_class << endl;
+                } else {
+                    incorrect++;
+                }
+            } else if (k == 3) {
+                three_closest_instances(distances, act_pop, index_array_3);
+                //new_class = new_classification_average(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
+                new_class = new_classification_common(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
+                cout << "Calculated classification for Data_Point " << (i + 1) << " is " << new_class << endl;
+                if ((trng_set[i].clsfr < 0 && new_class < 0) || (trng_set[i].clsfr == 0 && new_class == 0) ||
+                    (trng_set[i].clsfr > 0 && new_class > 0)) {
+                    correct++;
+                    trng_set[i].clsfr = new_class;
+                    cout << "New classification for Data Point " << (i + 1) << " is " << new_class << endl;
+                } else {
+                    incorrect++;
+                }
+
+
+            } else if (k == 5) {
+                five_closest_instances(distances, act_pop, index_array_5);
+                // new_class = new_classification_average(trng_set, index_array_5[0], index_array_5[1], index_array_5[2],
+                //                                       index_array_5[3], index_array_5[4]);
+                new_class = new_classification_common(trng_set, index_array_5[0], index_array_5[1], index_array_5[2],
+                                                 index_array_5[3], index_array_5[4]);
+                cout << "Calculated classification for Data Point " << (i + 1) << " is " << new_class << endl;
+                if ((trng_set[i].clsfr < 0 && new_class < 0) ||
+                    (trng_set[i].clsfr == 0 && new_class == 0) ||
+                    (trng_set[i].clsfr > 0 && new_class > 0)) {
+                    correct++;
+                    trng_set[i].clsfr = new_class;
+                    cout << "New classification for Data Point " << (i + 1) << " is " << new_class << endl;
+                } else {
+                    incorrect++;
+                }
             }
-        } else if (k == 3) {
-            three_closest_instances(distances, act_pop, index_array_3);
-           // new_class = new_classification_average(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1,
-           //                                        -1);
-            new_class = new_classification_common(trng_set, index_array_3[0], index_array_3[1], index_array_3[2], -1, -1);
-            //trng_set[random_index].clsfr = new_class;
-            cout << "New classification for Data_Point " << (i + 1) << " is " << new_class << endl;
-            if ((trng_set[i].clsfr < 0 && new_class < 0) || (trng_set[i].clsfr == 0 && new_class == 0) ||
-                (trng_set[i].clsfr > 0 && new_class > 0)) {
-                correct++;
-            } else {
-                incorrect++;
-            }
 
-        } else if (k == 5) {
-            five_closest_instances(distances, act_pop, index_array_5);
-            //new_class = new_classification_average(trng_set, index_array_5[0], index_array_5[1], index_array_5[2],
-            //                                       index_array_5[3], index_array_5[4]);
-            new_class = new_classification_common(trng_set, index_array_5[0], index_array_5[1], index_array_5[2], index_array_5[3], index_array_5[4]);
-            // trng_set[random_index].clsfr = new_class;
-            cout << "New classification for Data Point " << (i + 1) << " is " << new_class << endl;
-            if ((trng_set[i].clsfr < 0 && new_class < 0) ||
-                (trng_set[i].clsfr == 0 && new_class == 0) ||
-                (trng_set[i].clsfr > 0 && new_class > 0)) {
-                correct++;
-            } else {
-                incorrect++;
-            }
         }
-
-    }
 
     //return classification rate
     cout << "The classification rate for k-nearest neighbor is: " << (correct / (incorrect + correct)) << endl;
@@ -189,7 +189,7 @@ int init_trng_set(Data_Point trng_set[]) {
     }
 
 
-// Calculate distance between target training instance and the other 595 training instances.
+// Calculate distance between target training instance and the other 594 training instances.
 
 float* distance(Data_Point trng_set[], int array_length, int random_index, float distances[]) {
 
