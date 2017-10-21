@@ -42,6 +42,8 @@ class Data_Point {
     double grnn_classify(Data_Point trng_set[], double* sigma, int pop_index);
     
     double grnn_classify(Data_Point trng_set[], double sigma);
+    
+    double knn_classify(Data_Point trng_set[], int k);
 };
 
 class Std_Deviation {
@@ -90,23 +92,29 @@ class Std_Deviation {
                 temp_sigma[i*NUM_DATA_POINTS + j] = ((double) rand() / RAND_MAX) * (max_sigma - min_sigma) + min_sigma;
             }
         }
-
+        
+        // Initialize fitness to 0
         for (int i = 0; i < pop_size; i++) {
             temp_fitness[i] = 0;
         }
         double prediction;
         
+        // Evaluate the fitness of initial population
         cout << "\nInitial Fitness of Population" << endl;
         for (int i = 0; i < pop_size; i++) {
             prediction = 0;
             for (int j = 0; j < NUM_DATA_POINTS; j++) {
                 prediction = trng_set[j].grnn_classify(trng_set, temp_sigma, i);
+                // Assess prediction
                 if (prediction < 0 && trng_set[j].clsfr < 0 || prediction > 0 && trng_set[j].clsfr > 0) {
                     temp_fitness[i]++;
                 }
             }
             temp_fitness[i] = temp_fitness[i] / NUM_DATA_POINTS;
+            // Print fitness of individuals
             cout << "Individual " << i << ": " << temp_fitness[i] << endl;
+            
+            // Rank individuals in population for sorting and for linear rank proportional parent selection
             temp_rank[i] = 1;
             for (int j = 0; j < i; j++) {
                 if (temp_fitness[i] > temp_fitness[j]) {
@@ -118,8 +126,7 @@ class Std_Deviation {
             }
         }
         
-        
-        
+        // Sort parents based on rank
         for (int i = 0; i < pop_size; i++) {
             for (int j = 0; j < NUM_DATA_POINTS; j++) {
                 sigma[NUM_DATA_POINTS*(temp_rank[i]-1) + j] = temp_sigma[NUM_DATA_POINTS*i + j];
@@ -128,25 +135,31 @@ class Std_Deviation {
             rank[temp_rank[i]-1] = temp_rank[i];
         }
         
+        // Free dynamically allocated memory
         delete [] temp_fitness;
         delete [] temp_sigma;
         delete [] temp_rank;
         
     }
     
+    // return fitness of individual at specified index
     void set_fitness(double fitness_in, int index) {
         fitness[index] = fitness_in;
     }
     
-    void assess_fitness(Data_Point trng_set[]) {
+    // Assess the fitness of rank population
+    void assess_fitness(Data_Point trng_set[], int child) {
         
+        // Initialize and allocate memory for temporary variables
         double* temp_fitness;
         temp_fitness = new double[pop_size];
+        double* temp_sigma;
+        temp_sigma = new double[pop_size*NUM_DATA_POINTS];
         int* temp_rank;
         temp_rank = new int[pop_size];
         double prediction;
         
-        cout << "\nFitness of Children" << endl;
+        // Evaluate fitness of population
         for (int i = 0; i < pop_size; i++) {
             prediction = 0;
             for (int j = 0; j < NUM_DATA_POINTS; j++) {
@@ -159,7 +172,6 @@ class Std_Deviation {
                 }
             }
             temp_fitness[i] /= NUM_DATA_POINTS;
-            cout << "Child " << i << ": " << temp_fitness[i] << endl;
             temp_rank[i] = 1;
             for (int j = 0; j < i; j++) {
                 if (temp_fitness[i] > temp_fitness[j]) {
@@ -171,13 +183,27 @@ class Std_Deviation {
             }
         }
         
-        
+        for (int i = 0; i < pop_size; i++) {
+            for (int j = 0; j < NUM_DATA_POINTS; j++) {
+                temp_sigma[NUM_DATA_POINTS*i + j] = sigma[NUM_DATA_POINTS*i + j];
+            }
+        }
         
         for (int i = 0; i < pop_size; i++) {
+            for (int j = 0; j < NUM_DATA_POINTS; j++) {
+                sigma[NUM_DATA_POINTS*(temp_rank[i]-1) + j] = temp_sigma[NUM_DATA_POINTS*i + j];
+            }
             fitness[temp_rank[i]-1] = temp_fitness[i];
             rank[temp_rank[i]-1] = temp_rank[i];
         }
+        if (child == 1) {
+            cout << "\nFitness of Children" << endl;
+            for (int i = 0; i < pop_size; i++) {
+                cout << "Child " << i << ": " << fitness[i] << endl;
+            }
+        }
         
+        delete [] temp_sigma;
         delete [] temp_fitness;
         delete [] temp_rank;
     }
@@ -226,18 +252,24 @@ class Std_Deviation {
         }
     }
     
-    void procreate(Data_Point trng_set[]) {
+    double procreate(Data_Point trng_set[], int k) {
         Std_Deviation temp_children(pop_size);
+        Std_Deviation k_best_parents(k);
         
         // Mutation rate
-        double mutation_dev = 0.001;
+        double mutation_dev = 0.005;
         default_random_engine generator(time(0));
         normal_distribution<double> mutation(0.0,1.0);
         
         if (pop_size % 2 == 0) {
             double parent1_sigma;
             double parent2_sigma;
-            for (int i = 0; i < pop_size; i += 2) {
+            for (int i = 0; i < k; i++) {
+                for (int j = 0; j < NUM_DATA_POINTS; j++) {
+                    temp_children.sigma[i*NUM_DATA_POINTS + j] = sigma[i*NUM_DATA_POINTS + j] + mutation_dev * mutation(generator);
+                }
+            }
+            for (int i = k; i < pop_size; i += 2) {
                 for (int j = 0; j < NUM_DATA_POINTS; j++) {
                     parent1_sigma = sigma[NUM_DATA_POINTS*i + j];
                     parent2_sigma = sigma[NUM_DATA_POINTS*(i+1) + j];
@@ -256,10 +288,12 @@ class Std_Deviation {
         else {
             double parent1_sigma;
             double parent2_sigma;
-            for (int j = 0; j < NUM_DATA_POINTS; j++) {
-                temp_children.sigma[j] = sigma[j] + mutation_dev * mutation(generator);
+            for (int i = 0; i < k+1; i++) {
+                for (int j = 0; j < NUM_DATA_POINTS; j++) {
+                    temp_children.sigma[i*NUM_DATA_POINTS + j] = sigma[i*NUM_DATA_POINTS + j] + mutation_dev * mutation(generator);
+                }
             }
-            for (int i = 1; i < pop_size; i +=2) {
+            for (int i = k+1; i < pop_size - k; i +=2) {
                 for (int j = 0; j < NUM_DATA_POINTS; j++) {
                     parent1_sigma = sigma[NUM_DATA_POINTS*i + j];
                     parent2_sigma = sigma[NUM_DATA_POINTS*(i+1) + j];
@@ -274,15 +308,20 @@ class Std_Deviation {
                 }
             }
         }
-        temp_children.assess_fitness(trng_set);
+        temp_children.assess_fitness(trng_set, 1);
         
-        for (int i = 0; i < pop_size; i++) {
+        assess_fitness(trng_set, 0);
+        
+        for (int i = k; i < pop_size; i++) {
             for (int j = 0; j < NUM_DATA_POINTS; j++) {
-                sigma[NUM_DATA_POINTS*i + j] = temp_children.sigma[NUM_DATA_POINTS*i + j];
+                sigma[NUM_DATA_POINTS*i + j] = temp_children.sigma[NUM_DATA_POINTS*(i-k) + j];
             }
-            fitness[i] = temp_children.fitness[i];
-            rank[i] = temp_children.rank[i];
+            fitness[i] = temp_children.fitness[i-k];
+            rank[i] = temp_children.rank[i-k];
         }
+        
+        assess_fitness(trng_set, 0);
+        return fitness[0];
     }
     
     ~Std_Deviation() {
@@ -305,17 +344,25 @@ int main() {
     init_trng_set(trng_set);
     
     cout << "\n***Generation 0***" << endl;
-    Std_Deviation sigmas(trng_set, 10);
-
-    for (int i = 0; i < 100; i++) {
+    //Std_Deviation sigmas(trng_set, 10);
+    
+    /**
+    double best_fitness = 0;
+    double current_fitness;
+    for (int i = 0; i < 10000; i++) {
         sigmas.select_parents();
-        sigmas.procreate(trng_set);
+        current_fitness = sigmas.procreate(trng_set, 2);
+        if (current_fitness > best_fitness) {
+            best_fitness = current_fitness;
+        }
+        cout << "\nBest Fitness: " << best_fitness;
         cout << "\n***Generation " << i+1 << "***\n" << endl;
     }
+    */
     
     int TP, TN, FP, FN, U;
-    double clsf_rate;
-    clsf_rate = 0;
+    double grnn_clsf_rate;
+    grnn_clsf_rate = 0;
     TP = 0;
     TN = 0;
     FP = 0;
@@ -325,11 +372,11 @@ int main() {
         double prediction = trng_set[i].grnn_classify(trng_set, sigma);
         if (prediction < 0 && trng_set[i].clsfr < 0) {
             TN++;
-            clsf_rate++;
+            grnn_clsf_rate++;
         }
         else if (prediction > 0 && trng_set[i].clsfr > 0) {
             TP++;
-            clsf_rate++;
+            grnn_clsf_rate++;
         }
         else if (prediction < 0 && trng_set[i].clsfr > 0) {
             FN++;
@@ -341,8 +388,8 @@ int main() {
             U++;
         }
     }
-    clsf_rate /= NUM_DATA_POINTS;
-    cout << "Prediction Rate: " << clsf_rate << endl;
+    grnn_clsf_rate /= NUM_DATA_POINTS;
+    cout << "Prediction Rate: " << grnn_clsf_rate << endl;
     cout << "True Positives: " << TP << endl;
     cout << "True Negatives: " << TN << endl;
     cout << "False Positives: " << FP << endl;
@@ -350,6 +397,22 @@ int main() {
     if (U > 0) {
         cout << "Unclassifiables: " << U << endl;
     }
+    
+    cout << "\nDistance weighted k-nearest neighbors" << endl;
+    double knn_clsf_rate;
+    int k = NUM_DATA_POINTS;
+    knn_clsf_rate = 0;
+    for (int i = 0; i < NUM_DATA_POINTS; i++) {
+        double prediction = trng_set[i].knn_classify(trng_set, k);
+        if (prediction < 0 && trng_set[i].clsfr < 0 || prediction > 0 && trng_set[i].clsfr > 0) {
+            knn_clsf_rate++;
+        }
+    }
+    knn_clsf_rate /= NUM_DATA_POINTS;
+    
+    cout << "Prediction Rate: " << knn_clsf_rate << endl;
+    
+    
     return 0;
 }
 
@@ -401,4 +464,58 @@ double Data_Point::grnn_classify(Data_Point trng_set[], double sigma) {
     }
     return weighted_gaussian / gaussian;
 }
+
+double Data_Point::knn_classify(Data_Point trng_set[], int k) {
+    double* k_clsfr;
+    k_clsfr = new double[k];
+    double* k_distances;
+    k_distances = new double[k];
+    double min_distance = 80000;
+    int min_k_index;
+    double distance;
+    for (int i = 0; i < k; i++) {
+        min_distance = 80000;
+        for (int j = 0; j < NUM_DATA_POINTS; j++) {
+            distance = 0;
+            for (int l = 0; l < NUM_FEATURES; l++) {
+                distance += pow((trng_set[j].feat_vecs[l] - this->feat_vecs[l]), 2);
+            }
+            //cout << "distance: " << distance << endl;
+            bool in_array = false;
+            for (int m = 0; m < i; m++) {
+                if (fabs(distance - k_distances[m]) < 0.0000001) {
+                    in_array = true;
+                    break;
+                }
+            }
+            if (distance < min_distance && !in_array && distance > 0.0000001) {
+                min_distance = distance;
+                min_k_index = j;
+            }
+
+        }
+        //cout << "k_distances[i-1] " << k_distances[i-1] << endl;
+        //cout << "min_distance " << min_distance << endl;
+        //cout << "fabs(distance - k_distances[i-1]): " << fabs(min_distance - k_distances[i-1]) << endl;
+        k_distances[i] = min_distance;
+        //cout << min_k_index << endl;
+        k_clsfr[i] = trng_set[min_k_index].clsfr;
+        //cout << k_distances[i] << endl;
+    }
+    double prediction = 0;
+    double denominator = 0;
+    for (int i = 0; i < k; i++) {
+        prediction += k_clsfr[i] / (k_distances[i]);
+        denominator += 1 / k_distances[i];
+    }
+    prediction /= denominator;
+    delete k_clsfr;
+    delete k_distances;
+    return prediction;
+}
+
+
+
+
+
 
